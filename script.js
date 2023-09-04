@@ -1,8 +1,11 @@
 // to test on the actual device if .js file loads up correctly
 // it does not :(
-let a = document.createElement("h1");
-a.innerHTML = "Hello";
-document.querySelector("body").prepend(a);
+// window.addEventListener("load", (event) => {
+    // console.log("run")
+    let a = document.createElement("h1");
+    a.innerHTML = "Hello";
+    document.querySelector("body").prepend(a);
+// })
 
 // function stopOtherStations(currentAudioElement) {
 //     let audioElements = document.getElementsByTagName("audio");
@@ -42,8 +45,8 @@ document.querySelector("body").prepend(a);
 //         clearInterval(intervalId);
 //     });
 
-};
+// };
 
-// scraping HTML of https://www.silver.ru and other websites for tags 
+// scraping HTML of https://www.silver.ru and other websites for tags
 // is in conflict with CORS restrictions and is hard to do in a
 // serverless environment (blocked by browser by design)
