@@ -35,6 +35,11 @@ window.onload = function (event) {
     audioAsebeia.addEventListener("pause", (event) => {
         clearInterval(intervalId);
     });
+
+    // to test on the actual device if .js file loads up correctly
+    let a = document.createElement("h1");
+    a.innerHTML = "Hello"
+    document.querySelector("body").prepend(a)
 };
 
 // scraping HTML of https://www.silver.ru and other websites for tags 
