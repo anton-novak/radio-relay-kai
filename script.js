@@ -11,6 +11,34 @@ document.querySelector("body").appendChild(a);
 //     });
 // };
 
+function playPause(audioElement) {
+    let playing = false;
+    return function() {
+        if (!playing) {
+            audioElement.play()
+                .then(() => {
+                    playing = true;
+                });
+        } else {
+            // .pause() does not return anything
+            audioElement.pause()
+            playing = false;
+        };
+    };
+};
+
+window.onload = function(event) {
+    let stations = Array.from(document.querySelectorAll(".station"));
+    stations.forEach((station) => {
+        let audioEl = station.querySelector("audio");
+        let button = station.querySelector("button");
+        let handler = playPause(audioEl);
+        button.addEventListener("click", (event) => {
+            handler();
+        });
+    });
+};
+
 // async function getAsebeiaNowPlaying() {
 //     let response = await fetch("https://azura.asebeia.su/api/nowplaying/1");
 //     let nowPlaying = await response.json();
