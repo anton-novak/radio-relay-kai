@@ -4,7 +4,8 @@ let a = document.createElement("h1");
 a.innerHTML = "Hello";
 document.querySelector("body").appendChild(a);
 
-let lastPlayingButton = undefined;
+let lastPlayButton = undefined;
+let globalPlaying = false;
 
 function playPause(audioElement) {
     let playing = false;
@@ -18,6 +19,7 @@ function playPause(audioElement) {
             audioElement.pause();
             playing = false;
         };
+        return playing;
     };
 };
 
@@ -28,9 +30,10 @@ window.onload = function(event) {
         let button = station.querySelector("button");
         let handler = playPause(audioEl);
         button.addEventListener("click", (event) => {
-            handler();
-            if (lastPlayingButton && lastPlayingButton !== button) lastPlayingButton.click();
-            if (lastPlayingButton !== button) lastPlayingButton = button;
+            let newPlaying = handler();
+            if (globalPlaying && newPlaying) lastPlayButton.click();
+            globalPlaying = newPlaying;
+            newPlaying ? lastPlayButton = button : lastPlayButton = undefined;
         });
     });
 };
