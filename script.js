@@ -4,24 +4,18 @@ let a = document.createElement("h1");
 a.innerHTML = "Hello";
 document.querySelector("body").appendChild(a);
 
-// function stopOtherStations(currentAudioElement) {
-//     let audioElements = document.getElementsByTagName("audio");
-//     Array.from(audioElements).forEach(element => {
-//         if (element !== currentAudioElement) element.pause();
-//     });
-// };
+let lastPlayingButton = undefined;
 
 function playPause(audioElement) {
     let playing = false;
     return function() {
         if (!playing) {
-            audioElement.play()
-                .then(() => {
-                    playing = true;
-                });
+            audioElement.play();
+            // KaiOS browser apparently is too old and does not return a value from .play() so no promises
+            playing = true;
         } else {
-            // .pause() does not return anything
-            audioElement.pause()
+            // .pause() does not return anything by default
+            audioElement.pause();
             playing = false;
         };
     };
@@ -35,6 +29,8 @@ window.onload = function(event) {
         let handler = playPause(audioEl);
         button.addEventListener("click", (event) => {
             handler();
+            if (lastPlayingButton && lastPlayingButton !== button) lastPlayingButton.click();
+            if (lastPlayingButton !== button) lastPlayingButton = button;
         });
     });
 };
