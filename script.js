@@ -15,14 +15,13 @@ function playPause(audioElement) {
 };
 
 // fetch is not compatible with gecko 38
-
 function getAsebeiaNowPlaying(callback) {
     const xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
             callback(xhr.response);
-        }
+        };
     };
 
     xhr.open("GET", "https://azura.asebeia.su/api/nowplaying/1", true);
@@ -51,7 +50,7 @@ window.onload = function (event) {
     let nowPlayingAsebeia = document.createElement("p");
     let intervalId;
 
-    audioAsebeia.addEventListener("playing", async (event) => {
+    audioAsebeia.addEventListener("playing", (event) => {
         document.getElementById("now-playing").appendChild(nowPlayingAsebeia);
         getAsebeiaNowPlaying((data) => {
             data = JSON.parse(data);
