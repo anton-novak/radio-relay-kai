@@ -14,12 +14,12 @@ function playPause(audioElement) {
     };
 };
 
-function getAsebeiaNowPlaying() {
-    return fetch("https://azura.asebeia.su/api/nowplaying/1")
-        .then((response) => {
-            return response.json();
-        });
-};
+// function getAsebeiaNowPlaying() {
+//     return fetch("https://azura.asebeia.su/api/nowplaying/1")
+//         .then((response) => {
+//             return response.json();
+//         });
+// };
 
 window.onload = function (event) {
     // stopping other stations when starting playback of a new one
@@ -39,28 +39,28 @@ window.onload = function (event) {
     });
 
     // get track info from asebeia
-    let audioAsebeia = document.getElementById("asebeia-station");
-    let nowPlayingAsebeia = document.createElement("p");
-    let intervalId;
+    // let audioAsebeia = document.getElementById("asebeia-station");
+    // let nowPlayingAsebeia = document.createElement("p");
+    // let intervalId;
 
-    audioAsebeia.addEventListener("playing", async (event) => {
-        document.getElementById("now-playing").appendChild(nowPlayingAsebeia);
-        getAsebeiaNowPlaying()
-            .then((data) => {
-                nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
-            });
-        intervalId = setInterval(() => {
-            getAsebeiaNowPlaying()
-                .then((data) => {
-                    nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
-                });
-        }, 10000);
-    });
+    // audioAsebeia.addEventListener("playing", async (event) => {
+    //     document.getElementById("now-playing").appendChild(nowPlayingAsebeia);
+    //     getAsebeiaNowPlaying()
+    //         .then((data) => {
+    //             nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
+    //         });
+    //     intervalId = setInterval(() => {
+    //         getAsebeiaNowPlaying()
+    //             .then((data) => {
+    //                 nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
+    //             });
+    //     }, 10000);
+    // });
 
-    audioAsebeia.addEventListener("pause", (event) => {
-        clearInterval(intervalId);
-        nowPlayingAsebeia.remove();
-    });
+    // audioAsebeia.addEventListener("pause", (event) => {
+    //     clearInterval(intervalId);
+    //     nowPlayingAsebeia.remove();
+    // });
 };
 
 // scraping HTML of https://www.silver.ru and other websites for tags
