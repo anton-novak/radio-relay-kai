@@ -1,15 +1,6 @@
-// to test on the actual device if .js file loads up correctly
-// it does not :(
-let a = document.createElement("h1");
-a.innerHTML = "Hello";
-document.querySelector("body").appendChild(a);
-
-let lastPlayButton = undefined;
-let globalPlaying = false;
-
 function playPause(audioElement) {
     let playing = false;
-    return function() {
+    return function () {
         if (!playing) {
             audioElement.play();
             // KaiOS browser apparently is too old and does not return a value from .play() so no promises
@@ -23,7 +14,17 @@ function playPause(audioElement) {
     };
 };
 
-window.onload = function(event) {
+function getAsebeiaNowPlaying() {
+    return fetch("https://azura.asebeia.su/api/nowplaying/1")
+        .then((response) => {
+            return response.json();
+        });
+};
+
+window.onload = function (event) {
+    // stopping other stations when starting playback of a new one
+    let lastPlayButton = undefined;
+    let globalPlaying = false;
     let stations = Array.from(document.querySelectorAll(".station"));
     stations.forEach((station) => {
         let audioEl = station.querySelector("audio");
@@ -36,41 +37,32 @@ window.onload = function(event) {
             newPlaying ? lastPlayButton = button : lastPlayButton = undefined;
         });
     });
+
+    // get track info from asebeia
+    let audioAsebeia = document.getElementById("asebeia-station");
+    let nowPlayingAsebeia = document.createElement("p");
+    let intervalId;
+
+    audioAsebeia.addEventListener("playing", async (event) => {
+        document.getElementById("now-playing").appendChild(nowPlayingAsebeia);
+        getAsebeiaNowPlaying()
+            .then((data) => {
+                nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
+            });
+        intervalId = setInterval(() => {
+            getAsebeiaNowPlaying()
+                .then((data) => {
+                    nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
+                });
+        }, 10000);
+    });
+
+    audioAsebeia.addEventListener("pause", (event) => {
+        clearInterval(intervalId);
+        nowPlayingAsebeia.remove();
+    });
 };
 
-// async function getAsebeiaNowPlaying() {
-//     let response = await fetch("https://azura.asebeia.su/api/nowplaying/1");
-//     let nowPlaying = await response.json();
-//     return nowPlaying.now_playing.song.text;
-// };
-
-// window.onload = function (event) {
-//     let audioElements = document.getElementsByTagName("audio");
-//     Array.from(audioElements).forEach(element => {
-//         element.addEventListener("play", (event) => {
-//             stopOtherStations(element);
-//         });
-//     });
-
-//     // asebeia-specific code
-//     let audioAsebeia = document.getElementById("asebeia-station");
-//     let intervalId;
-
-//     audioAsebeia.addEventListener("playing", async (event) => {
-//         let nowPlayingAsebeia = document.getElementById("now-playing-asebeia");
-//         nowPlayingAsebeia.innerHTML = `Now playing: ${await getAsebeiaNowPlaying()}`;
-//         intervalId = setInterval(async () => {
-//             console.log(await getAsebeiaNowPlaying());
-//             nowPlayingAsebeia.innerHTML = `Now playing: ${await getAsebeiaNowPlaying()}`;
-//         }, 10000);
-//     });
-
-//     audioAsebeia.addEventListener("pause", (event) => {
-//         clearInterval(intervalId);
-//     });
-
-// };
-
-// // scraping HTML of https://www.silver.ru and other websites for tags
-// // is in conflict with CORS restrictions and is hard to do in a
-// // serverless environment (blocked by browser by design)
+// scraping HTML of https://www.silver.ru and other websites for tags
+// is in conflict with CORS restrictions and is hard to do in a
+// serverless environment (blocked by browser by design)
