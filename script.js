@@ -28,6 +28,25 @@ function getAsebeiaNowPlaying(callback) {
     xhr.send();
 };
 
+function getSilverHTML(callback) {
+    const xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+            callback(xhr.response);
+        };
+    };
+    // bypassing cors to scrape for data
+    xhr.open("GET", 'https://corsproxy.io/?' + encodeURIComponent('https://www.silver.ru/time-schedule/'), true);
+    xhr.send();
+};
+
+function findSilverNowPlaying(scrapedText) {
+    let match = scrapedText.match(/'В эфире: .+?'/g);
+    console.log(match);
+    return match[0].slice(1, match[0].length - 1);
+};
+
 window.onload = function (event) {
     // stopping other stations when starting playback of a new one
     let lastPlayButton = undefined;
@@ -46,30 +65,43 @@ window.onload = function (event) {
     });
 
     // get track info from asebeia
+    let nowPlayingA = document.createElement("p");
     let audioAsebeia = document.getElementById("asebeia-station");
-    let nowPlayingAsebeia = document.createElement("p");
     let intervalId;
 
     audioAsebeia.addEventListener("playing", (event) => {
-        document.getElementById("now-playing").appendChild(nowPlayingAsebeia);
+        document.getElementById("now-playing").appendChild(nowPlayingA);
         getAsebeiaNowPlaying((data) => {
             data = JSON.parse(data);
-            nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
+            nowPlayingA.innerHTML = `Now playing: ${data.now_playing.song.text}`;
         });
         intervalId = setInterval(() => {
             getAsebeiaNowPlaying((data) => {
                 data = JSON.parse(data);
-                nowPlayingAsebeia.innerHTML = `Now playing: ${data.now_playing.song.text}`;
+                nowPlayingA.innerHTML = `Now playing: ${data.now_playing.song.text}`;
             });
         }, 10000);
     });
-
+    
     audioAsebeia.addEventListener("pause", (event) => {
         clearInterval(intervalId);
-        nowPlayingAsebeia.remove();
+        nowPlayingA.remove();
+    });
+    
+    // get program info from silver
+    let nowPlayingS = document.createElement("p");
+    let audioSilver = document.getElementById("silver-station");
+    let silverIntervalId;
+    
+    audioSilver.addEventListener("playing", (event) => {
+        document.getElementById("now-playing").appendChild(nowPlayingS);
+        getSilverHTML((response) => {
+            nowPlayingS.innerHTML = findSilverNowPlaying(response);
+        });
+    })
+
+    audioSilver.addEventListener("pause", (event) => {
+        clearInterval(silverIntervalId);
+        nowPlayingS.remove();
     });
 };
-
-// scraping HTML of https://www.silver.ru and other websites for tags
-// is in conflict with CORS restrictions and is hard to do in a
-// serverless environment (blocked by browser by design)
