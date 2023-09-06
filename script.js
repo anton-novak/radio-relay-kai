@@ -82,22 +82,27 @@ window.onload = function (event) {
             });
         }, 10000);
     });
-    
+
     audioAsebeia.addEventListener("pause", (event) => {
         clearInterval(intervalId);
         nowPlayingA.remove();
     });
-    
+
     // get program info from silver
     let nowPlayingS = document.createElement("p");
     let audioSilver = document.getElementById("silver-station");
     let silverIntervalId;
-    
+
     audioSilver.addEventListener("playing", (event) => {
         document.getElementById("now-playing").appendChild(nowPlayingS);
         getSilverHTML((response) => {
             nowPlayingS.innerHTML = findSilverNowPlaying(response);
         });
+        silverIntervalId = setInterval(() => {
+            getSilverHTML((response) => {
+                nowPlayingS.innerHTML = findSilverNowPlaying(response);
+            });
+        }, 60000);
     })
 
     audioSilver.addEventListener("pause", (event) => {
