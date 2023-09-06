@@ -1,14 +1,16 @@
-function playPause(audioElement) {
+function playPause(audioElement, buttonElement) {
     let playing = false;
     return function () {
         if (!playing) {
             audioElement.play();
             // KaiOS browser apparently is too old and does not return a value from .play() so no promises
             playing = true;
+            buttonElement.innerHTML = "⏸";
         } else {
             // .pause() does not return anything by default
             audioElement.pause();
             playing = false;
+            buttonElement.innerHTML = "⏵";
         };
         return playing;
     };
@@ -43,8 +45,11 @@ function getSilverHTML(callback) {
 
 function findSilverNowPlaying(scrapedText) {
     let match = scrapedText.match(/'В эфире: .+?'/g);
-    console.log(match);
-    return match[0].slice(1, match[0].length - 1);
+    if (match[0].includes("player.SetArtist")) {
+        return "Информация об эфире обновляется";
+    } else {
+        return match[0].slice(1, match[0].length - 1);
+    };
 };
 
 window.onload = function (event) {
@@ -55,7 +60,7 @@ window.onload = function (event) {
     stations.forEach((station) => {
         let audioEl = station.querySelector("audio");
         let button = station.querySelector("button");
-        let handler = playPause(audioEl);
+        let handler = playPause(audioEl, button);
         button.addEventListener("click", (event) => {
             let newPlaying = handler();
             if (globalPlaying && newPlaying) lastPlayButton.click();
