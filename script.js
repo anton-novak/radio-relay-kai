@@ -5,12 +5,12 @@ function playPause(audioElement, buttonElement) {
             audioElement.play();
             // KaiOS browser apparently is too old and does not return a value from .play() so no promises
             playing = true;
-            buttonElement.innerHTML = "⏸";
+            buttonElement.innerHTML = "Pause";
         } else {
             // .pause() does not return anything by default
             audioElement.pause();
             playing = false;
-            buttonElement.innerHTML = "⏵";
+            buttonElement.innerHTML = "Play";
         };
         return playing;
     };
